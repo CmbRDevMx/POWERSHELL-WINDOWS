@@ -1,0 +1,127 @@
+# Inicialización de oh-my-posh con tema personalizado
+(@(& 'C:/Users/retir/AppData/Local/Programs/oh-my-posh/bin/oh-my-posh.exe' init pwsh --config='C:\Users\retir\AppData\Local\Programs\oh-my-posh\themes\zash.omp.json' --print) -join "`n") | Invoke-Expression
+
+# Importar módulo de íconos de terminal
+Import-Module Terminal-Icons
+
+# Configuración de PSReadLine
+Set-PSReadLineOption -PredictionViewStyle ListView
+
+# Función para cambiar el directorio (alias cd)
+function cd {
+    param (
+        [string]$dir
+    )
+    Set-Location $dir
+}
+
+# Función para encontrar archivos (alias find)
+function find {
+    param (
+        [string]$path,
+        [string]$pattern = "*"
+    )
+    Get-ChildItem -Path $path -Recurse -Filter $pattern
+}
+
+# Función para mostrar las primeras líneas de un archivo (alias head)
+function head {
+    param (
+        [string]$fileName,
+        [int]$lines = 10
+    )
+    Get-Content $fileName | Select-Object -First $lines
+}
+
+# Función para mostrar las últimas líneas de un archivo (alias tail)
+function tail {
+    param (
+        [string]$fileName,
+        [int]$lines = 10
+    )
+    Get-Content $fileName | Select-Object -Last $lines
+}
+
+# Función para contar palabras, líneas y caracteres en un archivo (alias wc)
+function wc {
+    param (
+        [string]$fileName
+    )
+    $content = Get-Content $fileName
+    $lines = $content.Count
+    $words = ($content -join " " | Measure-Object -Word).Words
+    $chars = ($content -join " " | Measure-Object -Character).Characters
+    Write-Host "Lines: $lines"
+    Write-Host "Words: $words"
+    Write-Host "Characters: $chars"
+}
+
+# Función para buscar un patrón en un archivo (alias grep)
+function grep {
+    param (
+        [string]$pattern,
+        [string]$fileName
+    )
+    Select-String -Pattern $pattern -Path $fileName
+}
+
+# Función para cambiar permisos (alias chmod - simulada en Windows)
+function chmod {
+    param (
+        [string]$fileName,
+        [string]$permissions
+    )
+    # En Windows no hay chmod, pero podemos simular un cambio de atributos
+    $attributes = Get-Item $fileName
+    switch ($permissions) {
+        "read-only" { $attributes.Attributes = "ReadOnly" }
+        "hidden"    { $attributes.Attributes = "Hidden" }
+        default     { Write-Host "Permiso no soportado en Windows" }
+    }
+}
+
+# Función para descargar archivos (alias wget)
+function wget {
+    param (
+        [string]$url,
+        [string]$outputFile
+    )
+    Invoke-WebRequest -Uri $url -OutFile $outputFile
+}
+
+# Función para ver los procesos en ejecución (alias ps)
+function ps {
+    Get-Process
+}
+
+# Función para matar un proceso (alias kill)
+function kill {
+    param (
+        [int]$pid
+    )
+    Stop-Process -Id $pid
+}
+
+# Función para imprimir la fecha y hora actuales (alias date)
+function date {
+    Get-Date
+}
+
+# Función para comparar archivos (alias diff)
+function diff {
+    param (
+        [string]$file1,
+        [string]$file2
+    )
+    Compare-Object -ReferenceObject (Get-Content $file1) -DifferenceObject (Get-Content $file2)
+}
+
+# Función para mostrar la memoria disponible (alias free)
+function free {
+    Get-WmiObject -Class Win32_OperatingSystem | Select-Object @{Name="FreeMemoryMB";Expression={"{0:N0}" -f ($_.FreePhysicalMemory/1024)}}
+}
+
+# Función para simular el comando df (ver espacio en disco)
+function df {
+    Get-PSDrive -PSProvider FileSystem | Select-Object Name, @{Name="Used (GB)";Expression={[math]::round(($_.Used/1GB),2)}}, @{Name="Free (GB)";Expression={[math]::round(($_.Free/1GB),2)}}, @{Name="Total (GB)";Expression={[math]::round(($_.Used/1GB)+($_.Free/1GB),2)}}
+}
