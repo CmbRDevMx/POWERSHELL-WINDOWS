@@ -1,0 +1,93 @@
+# Inicialización de oh-my-posh con tema personalizado
+(@(& 'C:/Users/retir/AppData/Local/Programs/oh-my-posh/bin/oh-my-posh.exe' init pwsh --config='C:\Users\retir\AppData\Local\Programs\oh-my-posh\themes\zash.omp.json' --print) -join "`n") | Invoke-Expression
+
+# Importar módulo de íconos de terminal
+Import-Module Terminal-Icons
+
+# Configuración de PSReadLine
+Set-PSReadLineOption -PredictionViewStyle ListView
+
+# Función para mover archivos (alias mv)
+function mv {
+    param (
+        [string]$source,
+        [string]$destination
+    )
+    Move-Item $source -Destination $destination
+}
+
+# Función para simular el comando touch
+function touch {
+    param (
+        [string]$fileName
+    )
+    if (-Not (Test-Path $fileName)) {
+        New-Item -Path $fileName -ItemType File
+    } else {
+        Set-Content -Path $fileName -Value (Get-Content $fileName)
+    }
+}
+
+# Función para copiar archivos (alias cp)
+function cp {
+    param (
+        [string]$source,
+        [string]$destination
+    )
+    Copy-Item $source -Destination $destination
+}
+
+# Función para eliminar archivos (alias rm)
+function rm {
+    param (
+        [string]$fileName
+    )
+    Remove-Item $fileName
+}
+
+# Función para listar archivos y carpetas (alias ls)
+function ls {
+    Get-ChildItem
+}
+
+# Función para mostrar el contenido de un archivo (alias cat)
+function cat {
+    param (
+        [string]$fileName
+    )
+    Get-Content $fileName
+}
+
+# Función para crear un directorio (alias mkdir)
+function mkdir {
+    param (
+        [string]$dirName
+    )
+    New-Item -Path $dirName -ItemType Directory
+}
+
+# Función para eliminar un directorio (alias rmdir)
+function rmdir {
+    param (
+        [string]$dirName
+    )
+    Remove-Item $dirName -Recurse
+}
+
+# Función para mostrar el directorio actual (alias pwd)
+function pwd {
+    Get-Location
+}
+
+# Alias básicos de Linux
+Set-Alias ll Get-ChildItem
+Set-Alias grep Select-String
+Set-Alias clear Clear-Host
+
+# Comandos básicos de redirección
+function echo {
+    param (
+        [string]$message
+    )
+    Write-Output $message
+}
